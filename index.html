@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoTrace-Docs Suite | Secure File Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4 font-sans">
+
+    <div class="max-w-6xl w-full space-y-10">
+        
+        <div class="text-center">
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-blue-500 tracking-tighter mb-2">ZenDocs Suite</h1>
+            <p class="text-gray-400 font-medium">Professional File Processing • 100% Private • Local-First</p>
+            <div class="mt-4 inline-block px-4 py-1 rounded-full bg-gray-800 border border-gray-700 text-xs text-gray-500">
+                Created by <span class="text-emerald-400 font-bold">Srijen Gupta</span>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl border-2 border-red-500/30 bg-opacity-50 backdrop-blur-sm relative">
+            <div class="absolute top-6 right-8">
+                <div class="relative group cursor-help">
+                    <span class="text-gray-500 hover:text-red-400 text-xl font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-64 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-60 top-8 pointer-events-none">
+                        The ultimate PDF workspace. Upload multiple files to see page previews. Drag, drop, and delete pages to build your perfect document.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-red-400">Interactive PDF Studio</h2>
+                    <p class="text-sm text-gray-500">Split, Merge, and Reorder with visual previews</p>
+                </div>
+                <span id="studioLoading" class="text-yellow-500 text-sm hidden font-bold animate-pulse">Rendering Previews...</span>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-6">
+                <div class="bg-gray-900 p-4 rounded-xl border border-gray-700">
+                    <input type="file" id="studioFiles" accept=".pdf" multiple onchange="loadStudioFiles(event)" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer transition-all"/>
+                </div>
+                
+                <div id="studioGrid" class="flex flex-wrap justify-center gap-4 min-h-[200px] bg-gray-900/50 p-6 rounded-xl border-2 border-dashed border-gray-700">
+                    <div id="emptyStudioText" class="flex flex-col items-center justify-center opacity-30 mt-8">
+                        <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="font-medium text-lg text-center">Drag & Drop PDFs here to begin</p>
+                    </div>
+                </div>
+
+                <div id="studioControls" class="hidden">
+                    <button onclick="processStudio()" class="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-black py-4 rounded-xl transition-all shadow-lg text-lg uppercase tracking-wider">
+                        Export Organized PDF
+                    </button>
+                    <p id="studioStatus" class="text-sm mt-4 text-center font-bold"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition-all relative">
+                <div class="absolute top-4 right-4 relative group cursor-help">
+                    <span class="text-gray-500 hover:text-blue-400 text-sm font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-56 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-52 top-6 pointer-events-none">
+                        Converts PDF text and layouts into an editable Word (.docx) file. Best for resumes and reports.
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-blue-300 mb-4">PDF to Word</h3>
+                <input type="file" id="wordFile" accept=".pdf" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white mb-4 cursor-pointer"/>
+                <button onclick="processFile('wordFile', '/convert-to-word', 'word')" class="w-full bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white font-bold py-2 rounded border border-blue-500/50 transition">Convert</button>
+                <p id="wordStatus" class="text-xs mt-2 text-center"></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-green-500 transition-all relative">
+                <div class="absolute top-4 right-4 relative group cursor-help">
+                    <span class="text-gray-500 hover:text-green-400 text-sm font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-56 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-52 top-6 pointer-events-none">
+                        Uses structural analysis to find tables in your PDF and export them as a clean Excel sheet.
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-green-300 mb-4">PDF to Excel</h3>
+                <input type="file" id="excelFile" accept=".pdf" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:bg-green-600 file:text-white mb-4 cursor-pointer"/>
+                <button onclick="processFile('excelFile', '/convert-to-excel', 'excel')" class="w-full bg-green-500/10 hover:bg-green-500 text-green-400 hover:text-white font-bold py-2 rounded border border-green-500/50 transition">Extract Data</button>
+                <p id="excelStatus" class="text-xs mt-2 text-center"></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-purple-500 transition-all relative">
+                <div class="absolute top-4 right-4 relative group cursor-help">
+                    <span class="text-gray-500 hover:text-purple-400 text-sm font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-56 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-52 top-6 pointer-events-none">
+                        Renders your Word/Excel files into high-quality PDFs using a headless LibreOffice engine.
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-purple-300 mb-4">Office to PDF</h3>
+                <input type="file" id="officeFile" accept=".doc,.docx,.xls,.xlsx" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:bg-purple-600 file:text-white mb-4 cursor-pointer"/>
+                <button onclick="processFile('officeFile', '/convert-to-pdf', 'pdf')" class="w-full bg-purple-500/10 hover:bg-purple-500 text-purple-400 hover:text-white font-bold py-2 rounded border border-purple-500/50 transition">Generate PDF</button>
+                <p id="pdfStatus" class="text-xs mt-2 text-center"></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-pink-500 transition-all relative">
+                <div class="absolute top-4 right-4 relative group cursor-help">
+                    <span class="text-gray-500 hover:text-pink-400 text-sm font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-56 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-52 top-6 pointer-events-none">
+                        Stitches multiple images into one PDF. Perfect for scanning documents with your phone.
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-pink-300 mb-4">Image to PDF</h3>
+                <input type="file" id="imgPdfFile" accept=".jpg,.jpeg,.png" multiple class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:bg-pink-600 file:text-white mb-4 cursor-pointer"/>
+                <button onclick="processFile('imgPdfFile', '/img-to-pdf', 'imgpdf')" class="w-full bg-pink-500/10 hover:bg-pink-500 text-pink-400 hover:text-white font-bold py-2 rounded border border-pink-500/50 transition">Combine</button>
+                <p id="imgpdfStatus" class="text-xs mt-2 text-center"></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-orange-500 transition-all relative">
+                <div class="absolute top-4 right-4 relative group cursor-help">
+                    <span class="text-gray-500 hover:text-orange-400 text-sm font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-56 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-52 top-6 pointer-events-none">
+                        Converts every page of a PDF into high-res images and packs them into a ZIP file.
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-orange-300 mb-4">PDF to Image</h3>
+                <input type="file" id="pdfImgFile" accept=".pdf" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:bg-orange-600 file:text-white mb-4 cursor-pointer"/>
+                <button onclick="processFile('pdfImgFile', '/pdf-to-img', 'pdfimg')" class="w-full bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-white font-bold py-2 rounded border border-orange-500/50 transition">Export Images</button>
+                <p id="pdfimgStatus" class="text-xs mt-2 text-center"></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-teal-500 transition-all relative">
+                <div class="absolute top-4 right-4 relative group cursor-help">
+                    <span class="text-gray-500 hover:text-teal-400 text-sm font-bold transition-colors">ⓘ</span>
+                    <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-56 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-52 top-6 pointer-events-none">
+                        Reduces file size by optimizing internal images and metadata. Useful for email limits.
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-teal-300 mb-4">Compress File</h3>
+                <div class="flex gap-2 mb-4">
+                    <select id="compressLevel" class="bg-gray-900 border border-gray-700 text-[10px] rounded p-1 flex-1 outline-none">
+                        <option value="recommended">Recommended</option>
+                        <option value="extreme">Extreme</option>
+                    </select>
+                    <input type="file" id="compressFile" accept=".pdf,.jpg,.jpeg,.png" class="hidden"/>
+                    <label for="compressFile" class="bg-teal-600 hover:bg-teal-500 px-3 py-1 rounded text-[10px] cursor-pointer font-bold transition-colors flex items-center justify-center">Choose</label>
+                </div>
+                <button onclick="processFile('compressFile', '/compress', 'compress')" class="w-full bg-teal-500/10 hover:bg-teal-500 text-teal-400 hover:text-white font-bold py-2 rounded border border-teal-500/50 transition">Shrink</button>
+                <p id="compressStatus" class="text-xs mt-2 text-center"></p>
+            </div>
+
+        </div>
+
+        <div class="bg-emerald-900/20 p-6 rounded-2xl border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6 relative">
+            <div class="absolute top-4 right-6 relative group cursor-help">
+                <span class="text-emerald-700 hover:text-emerald-400 text-lg font-bold transition-colors">ⓘ</span>
+                <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute z-50 w-64 bg-gray-700 text-xs text-gray-100 p-3 rounded-lg shadow-2xl border border-gray-600 transition-all duration-200 -left-60 top-8 pointer-events-none">
+                    Removes password-based editing restrictions and sheet protection from Excel files. Does not crack read-passwords.
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="bg-emerald-500/20 p-3 rounded-full text-emerald-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-emerald-400">Unlock Excel Security</h3>
+                    <p class="text-sm text-emerald-600/80 font-medium">Instantly remove sheet passwords and write-protection</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
+                <input type="file" id="unlockFile" accept=".xlsx,.xlsm" class="text-xs text-gray-500 file:bg-emerald-600 file:text-white file:border-0 file:rounded-lg file:px-4 file:py-2 cursor-pointer flex-1 w-full"/>
+                <button onclick="processFile('unlockFile', '/unlock-excel', 'unlock')" class="w-full md:w-auto bg-emerald-500 hover:bg-emerald-400 text-gray-900 font-black px-8 py-2 rounded-lg transition-all shadow-lg whitespace-nowrap">Unlock File</button>
+            </div>
+        </div>
+        <p id="unlockStatus" class="text-sm text-center -mt-4 font-bold"></p>
+
+    </div>
+
+    <script>
+        const API_BASE_URL = "https://srijenjgupta-zendocs-backend.hf.space"; 
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        let currentStudioFiles = [];
+
+        new Sortable(document.getElementById('studioGrid'), { animation: 150, ghostClass: 'opacity-50' });
+
+        async function loadStudioFiles(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            currentStudioFiles = Array.from(files);
+            const grid = document.getElementById('studioGrid');
+            const loadingText = document.getElementById('studioLoading');
+            grid.innerHTML = ''; 
+            loadingText.classList.remove('hidden');
+            try {
+                for (let fileIdx = 0; fileIdx < currentStudioFiles.length; fileIdx++) {
+                    const file = currentStudioFiles[fileIdx];
+                    const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+                    for (let pageIdx = 0; pageIdx < pdf.numPages; pageIdx++) {
+                        const page = await pdf.getPage(pageIdx + 1);
+                        const viewport = page.getViewport({ scale: 0.3 });
+                        const canvas = document.createElement('canvas');
+                        canvas.width = viewport.width; canvas.height = viewport.height;
+                        canvas.className = 'rounded border border-gray-700 shadow-md bg-white';
+                        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                        
+                        const card = document.createElement('div');
+                        card.className = 'relative flex flex-col items-center bg-gray-800 p-2 rounded-xl cursor-grab hover:ring-2 hover:ring-red-500 transition-all w-[110px]';
+                        card.dataset.fileIdx = fileIdx; card.dataset.pageIdx = pageIdx;
+                        
+                        const delBtn = document.createElement('button');
+                        delBtn.innerHTML = '✕'; 
+                        delBtn.className = 'absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-[10px] shadow-xl hover:bg-red-500 z-10';
+                        delBtn.onclick = () => card.remove();
+                        
+                        const label = document.createElement('span');
+                        label.className = 'text-[9px] text-gray-500 mt-2 truncate w-full text-center px-1';
+                        label.innerText = file.name;
+                        
+                        card.appendChild(delBtn); card.appendChild(canvas); card.appendChild(label);
+                        grid.appendChild(card);
+                    }
+                }
+                document.getElementById('studioControls').classList.remove('hidden');
+            } catch (e) { alert(e.message); } finally { loadingText.classList.add('hidden'); }
+        }
+
+        async function processStudio() {
+            const grid = document.getElementById('studioGrid');
+            const items = grid.children;
+            const status = document.getElementById('studioStatus');
+            if (items.length === 0) return;
+            
+            const orderList = [];
+            for (let i = 0; i < items.length; i++) {
+                if(items[i].dataset.fileIdx) orderList.push({ file_idx: items[i].dataset.fileIdx, page: items[i].dataset.pageIdx });
+            }
+            
+            const formData = new FormData();
+            currentStudioFiles.forEach(f => formData.append("files", f));
+            formData.append("order", JSON.stringify(orderList));
+            
+            status.classList.remove('hidden'); status.className = "text-sm mt-4 text-center font-bold text-yellow-500";
+            status.innerText = "Stitching PDF securely...";
+            try {
+                const res = await fetch(API_BASE_URL + '/organize-pdf', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error("Processing failed.");
+                
+                const blob = await res.blob();
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'organized.pdf'; a.click();
+                status.innerText = "Success!"; status.className = "text-sm mt-4 text-center font-bold text-green-500";
+            } catch (e) { status.innerText = e.message; status.className = "text-sm mt-4 text-center font-bold text-red-500"; }
+        }
+
+        // Bulletproof Error Handling for Standard Tools
+        async function processFile(inputId, endpoint, type) {
+            const input = document.getElementById(inputId);
+            const status = document.getElementById(type + 'Status');
+            
+            if (!input.files || input.files.length === 0) {
+                alert("Please select a file first.");
+                return;
+            }
+            
+            const formData = new FormData();
+            if (type === 'imgpdf') { 
+                for(let f of input.files) formData.append("files", f); 
+            } else { 
+                formData.append("file", input.files[0]); 
+            }
+            
+            if (type === 'compress') {
+                formData.append("level", document.getElementById('compressLevel').value);
+            }
+            
+            status.classList.remove('hidden'); 
+            status.className = "text-xs mt-2 text-center font-bold text-yellow-500";
+            status.innerText = "Processing securely...";
+            
+            try {
+                const response = await fetch(API_BASE_URL + endpoint, { method: 'POST', body: formData });
+                
+                // 1. Check if the server sent an explicit error message (JSON)
+                if (!response.ok) {
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || "Server error occurred");
+                    } else {
+                        throw new Error(`Processing failed (Status ${response.status})`);
+                    }
+                }
+
+                // 2. If it is ok, proceed with downloading the file
+                const originalSize = response.headers.get("x-original-size");
+                const newSize = response.headers.get("x-new-size");
+                const blob = await response.blob();
+                
+                const a = document.createElement('a'); 
+                a.href = URL.createObjectURL(blob); 
+                
+                // Dynamic naming
+                if (type === 'word') a.download = 'converted.docx';
+                else if (type === 'excel') a.download = 'tables.xlsx';
+                else if (type === 'pdf') a.download = 'converted.pdf';
+                else if (type === 'imgpdf') a.download = 'merged.pdf';
+                else if (type === 'pdfimg') a.download = 'extracted_images.zip';
+                else if (type === 'unlock') a.download = 'unlocked_file.xlsx';
+                else if (type === 'compress') a.download = 'compressed_' + input.files[0].name;
+                
+                a.click();
+                
+                if (type === 'compress' && originalSize && newSize) {
+                    const mbSaved = ((originalSize - newSize) / (1024 * 1024)).toFixed(2);
+                    status.innerText = `Reduced to ${(newSize / (1024*1024)).toFixed(2)}MB (Saved ${mbSaved}MB).`;
+                } else {
+                    status.innerText = "Complete! File wiped from server.";
+                }
+                status.className = "text-xs mt-2 text-center font-bold text-green-500";
+            } catch (e) { 
+                status.innerText = e.message; 
+                status.className = "text-xs mt-2 text-center font-bold text-red-500"; 
+            }
+        }
+    </script>
+</body>
+</html>
