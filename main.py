@@ -176,10 +176,16 @@ async def compress_file(file: UploadFile = File(...), level: str = Form("recomme
             temp_out = temp_out.replace(".png", ".jpg")
             img.save(temp_out, "JPEG", optimize=True, quality=30 if level=="extreme" else 65)
         
-        headers = {"X-Original-Size": str(orig_size), "X-New-Size": str(os.path.getsize(temp_out))}
-        return FileResponse(temp_out, filename=f"compressed_{file.filename}", headers=headers, background=lambda: cleanup_files([temp_in, temp_out]))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Check if compression actually helped. If it made it bigger, revert to original!
+        new_size = os.path.getsize(temp_out)
+            if new_size >= orig_size:
+            temp_out = temp_in
+            new_size = orig_size
+            
+            headers = {"X-Original-Size": str(orig_size), "X-New-Size": str(new_size)}
+            return FileResponse(temp_out, filename=f"compressed_{file.filename}", headers=headers, background=lambda: cleanup_files([temp_in, temp_out]))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/unlock-excel")
 async def unlock_excel(file: UploadFile = File(...)):
