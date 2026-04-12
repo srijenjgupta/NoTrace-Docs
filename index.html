@@ -180,6 +180,34 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         let currentStudioFiles = [];
 
+        // --- DRAG AND DROP FILE UPLOAD LOGIC ---
+        const dropZone = document.getElementById('studioGrid');
+
+        // Prevent the browser from opening the PDF in a new tab when dropped
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Add visual cues when dragging over the box
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('border-red-500', 'bg-gray-800'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-red-500', 'bg-gray-800'), false);
+        });
+
+        // Catch the dropped files and send them to our existing load function
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            // Fake an event object so our existing function doesn't break
+            loadStudioFiles({ target: { files: files } });
+        }, false);
+
         new Sortable(document.getElementById('studioGrid'), { animation: 150, ghostClass: 'opacity-50' });
 
         async function loadStudioFiles(event) {
