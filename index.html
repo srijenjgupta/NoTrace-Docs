@@ -337,12 +337,18 @@
                 a.click();
                 
                 if (type === 'compress' && originalSize && newSize) {
-                    const mbSaved = ((originalSize - newSize) / (1024 * 1024)).toFixed(2);
-                    status.innerText = `Reduced to ${(newSize / (1024*1024)).toFixed(2)}MB (Saved ${mbSaved}MB).`;
+                    const originalMb = originalSize / (1024 * 1024);
+                    const newMb = newSize / (1024 * 1024);
+                    const mbSaved = (originalMb - newMb).toFixed(2);
+                    
+                    if (mbSaved <= 0.00) {
+                        status.innerText = `Complete! File is already fully optimized (${originalMb.toFixed(2)}MB).`;
+                    } else {
+                        status.innerText = `Reduced to ${newMb.toFixed(2)}MB (Saved ${mbSaved}MB).`;
+                    }
                 } else {
                     status.innerText = "Complete! File wiped from server.";
-                }
-                status.className = "text-xs mt-2 text-center font-bold text-green-500";
+                }            
             } catch (e) { 
                 status.innerText = e.message; 
                 status.className = "text-xs mt-2 text-center font-bold text-red-500"; 
